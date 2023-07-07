@@ -1,5 +1,5 @@
 import express from 'express'
-import { Order } from '../models'
+import Order from '../models'
 
 const router = express.Router()
 
@@ -20,6 +20,7 @@ router
       items,
       orderTotal,
     } = req.body
+    //Creating an orderData object
     const itemIdList = items.map((i) => i._id)
     const orderData = {
       customerName: `${firstName} ${lastName}`,
@@ -33,7 +34,11 @@ router
       /* create new order using Order model
         and return order ID
       */
-      res.json(orderData)
+     const order = await Order.create(orderData)
+     // retrieve the order ID
+     const orderID = order._id
+     // return the order ID as a response
+      res.json({orderID})
     } catch (error) {
       next(new Error('Error Placing Order'))
     }

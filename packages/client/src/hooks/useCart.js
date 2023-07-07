@@ -1,4 +1,4 @@
-import React, { useReducer, useContext, createContext } from 'react'
+import React, { useReducer, useContext, createContext, useEffect } from 'react'
 
 const initialState = {
   cart: [],
@@ -17,6 +17,13 @@ const calculateCartTotal = (cartItems) => {
 const reducer = (state, action) => {
   let nextCart = [...state.cart];
   switch (action.type) {
+    case 'LOAD_CART':
+      return {
+        ...state,
+        cart: action.payload,
+        itemCount: calculateItemCount(action.payload),
+        cartTotal: calculateCartTotal(action.payload),
+      }
     case 'ADD_ITEM':
       const existingIndex = nextCart.findIndex(
         (item) => item._id === action.payload._id
@@ -42,6 +49,16 @@ const reducer = (state, action) => {
         cart: nextCart,
         itemCount: state.itemCount + 1,
       }
+      case 'UPDATE_ITEM':
+        nextCart = nextCart.map((item) => 
+        item._id === action.payload._id ? action.payload : item
+        );
+
+        return {
+          ...state,
+          cart: nextCart,
+          cartTotal: calculateCartTotal(nextCart),
+        }
     case 'REMOVE_ITEM':
       nextCart = nextCart
         .map((item) =>
@@ -77,6 +94,12 @@ const cartContext = createContext()
 // ... available to any child component that calls useCart().
 export function ProvideCart({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState)
+
+  useEffect(() => {
+    // Save cart to localStorage
+    localStorage.setItem('cart', JSON.stringify(state.cart))
+  }, [state.cart])
+
   return (
     <cartContext.Provider
       value={{
@@ -99,9 +122,37 @@ export const useCart = () => {
 const useProvideCart = () => {
   const { state, dispatch } = useCart()
 
+  // useEffect(() => {
+  //   // Check for saved cart in localStorage on load
+  //   const savedCart = JSON.parse(localStorage.getItem('cart')) || []
+  //   if (savedCart.length > 0) {
+  //     dispatch({
+  //       type: 'LOAD_CART',
+  //       payload: savedCart,
+  //     })
+  //   }
+  // }, [dispatch])
+
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem('KenzieCart')) || false
+    if (savedCart) {
+      dispatch({
+        type: 'LOAD_CART',
+        payload: savedCart,
+      })
+    }
+  }, [dispatch]) 
+
   const addItem = (item) => {
     dispatch({
       type: 'ADD_ITEM',
+      payload: item,
+    })
+  }
+
+  const updateItem = (item) => {
+    dispatch({
+      type: 'UPDATE_ITEM',
       payload: item,
     })
   }
@@ -144,6 +195,7 @@ const useProvideCart = () => {
   return {
     state,
     addItem,
+    updateItem,
     removeItem,
     removeAllItems,
     resetCart,
