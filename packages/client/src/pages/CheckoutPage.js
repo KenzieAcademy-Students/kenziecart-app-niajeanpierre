@@ -5,6 +5,7 @@ import { CheckoutForm, ErrorBoundary, LoadingSpinner } from 'components'
 import { useProvideCart } from 'hooks'
 import { createOrder } from 'utils/axiosService'
 import { Link } from 'react-router-dom'
+import { calculateCartTotal } from 'hooks/useCart'
 
 const initialState = {
   isSubmitting: false,
@@ -15,14 +16,14 @@ const initialState = {
 export default function CheckoutPage(props) {
   // state
   const [data, setData] = useState(initialState)
-  const { state, resetCart, calculateCartTotal } = useProvideCart()
+  const { state, resetCart } = useProvideCart()
 
   const placeOrder = async (orderFormData) => {
     console.log('handlePlaceOrder', orderFormData)
     let orderData = {
       customerDetails: orderFormData,
       items: state.cart,
-      orderTotal: calculateCartTotal(),
+      orderTotal: state?.cartTotal ?? 0 ,
     }
     setData({
       ...data,
