@@ -13,6 +13,6 @@
     "client": "npm run start --workspace=client",
     "server": "npm run start --workspace=server",
     "start": "concurrently --kill-others-on-fail \"npm run server\"  \"npm run client\"",
-    "seed": "yarn workspace server seed"
+    "seed": "npm run seed --workspace=server"
   }
 }

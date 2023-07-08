@@ -1,5 +1,5 @@
 import express from 'express'
-import Order from '../models'
+import Order from '../models/order';
 
 const router = express.Router()
 
@@ -11,8 +11,12 @@ router
     next()
   })
   .get(async (req, res, next) => {
+    try {
     const orders = await Order.find()
-    res.send(orders)
+    res.send(orders);
+    } catch (error) {
+      next(error);
+    }
   })
   .post(async (req, res, next) => {
     const {

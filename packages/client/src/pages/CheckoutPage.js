@@ -10,6 +10,7 @@ const initialState = {
   isSubmitting: false,
   isConfirmed: false,
   errorMessage: null,
+  orderId: '',
 }
 export default function CheckoutPage(props) {
   // state

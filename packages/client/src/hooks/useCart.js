@@ -21,7 +21,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         cart: action.payload,
-        itemCount: calculateItemCount(action.payload),
+        // itemCount: calculateItemCount(action.payload),
         cartTotal: calculateCartTotal(action.payload),
       }
     case 'ADD_ITEM':
@@ -47,7 +47,8 @@ const reducer = (state, action) => {
       return {
         ...state,
         cart: nextCart,
-        itemCount: state.itemCount + 1,
+        itemCount: state.itemCount + numItemsToAdd,
+        cartTotal: calculateCartTotal(nextCart), // these last two lines were edits for cart total debug
       }
       case 'UPDATE_ITEM':
         nextCart = nextCart.map((item) => 
