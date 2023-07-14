@@ -4,14 +4,10 @@ const initialState = {
   cart: [],
   itemCount: 0,
   cartTotal: 0,
-  isEUR: false,
-  cartTotalString: "$0.00",
 }
 
-export const eurFormatter = new Intl.NumberFormat("en-US", {style: "currency", currency: "EUR"})
-export const usdFormatter = new Intl.NumberFormat("en-US", {style: "currency", currency: "USD"})
 
-const calculateCartTotal = (cartItems) => {
+export const calculateCartTotal = (cartItems) => {
   let total = 0
 
   cartItems.map((item) => (total += item.price * item.quantity))
@@ -21,26 +17,12 @@ const calculateCartTotal = (cartItems) => {
 
 const reducer = (state, action) => {
   let nextCart = [...state.cart];
+  const numItemsToAdd = action.payload.quantity;
   switch (action.type) {
-    case 'TOGGLE':
-      return {
-        ...state,
-        isEUR: !state.isEUR,
-        cartTotalString: state.isEUR ?  eurFormatter.format(state.cartTotal) : usdFormatter.format(state.cartTotal)
-      }
-    case 'LOAD_CART':
-      return {
-        ...state,
-        cart: action.payload,
-        // itemCount: calculateItemCount(action.payload),
-        cartTotal: calculateCartTotal(action.payload),
-      }
     case 'ADD_ITEM':
       const existingIndex = nextCart.findIndex(
         (item) => item._id === action.payload._id
       )
-
-      const numItemsToAdd = action.payload.quantity;
 
       if (existingIndex >= 0) {
         const newQuantity = parseInt(
@@ -55,6 +37,9 @@ const reducer = (state, action) => {
         nextCart.push(action.payload)
       }
 
+      localStorage.setItem("KenzieCart", JSON.stringify(nextCart));
+
+      
       return {
         ...state,
         cart: nextCart,
@@ -80,6 +65,7 @@ const reducer = (state, action) => {
         )
         .filter((item) => item.quantity > 0);
 
+        localStorage.setItem("KenzieCart", JSON.stringify(nextCart))
       return {
         ...state,
         cart: nextCart,
@@ -88,6 +74,9 @@ const reducer = (state, action) => {
       }
     case 'REMOVE_ALL_ITEMS':
       let quantity = state.cart.find((i) => i._id === action.payload).quantity
+      
+      localStorage.setItem("KenzieCart", JSON.stringify(nextCart))
+
       return {
         ...state,
         cart: state.cart.filter((item) => item._id !== action.payload),
@@ -95,6 +84,16 @@ const reducer = (state, action) => {
       }
     case 'RESET_CART':
       return { ...initialState }
+      case 'INIT_SAVED_CART': {
+return {
+  ...state, 
+  cart: action.payload,
+  itemCount: action.payload.reduce((count, product) => count + product.quantity,
+   0
+   ),
+   cartTotal: calculateCartTotal(action.payload),
+};
+      }
     default:
       return state
   }
@@ -109,7 +108,7 @@ export function ProvideCart({ children }) {
 
   useEffect(() => {
     // Save cart to localStorage
-    localStorage.setItem('cart', JSON.stringify(state.cart))
+    localStorage.setItem('KenzieCart', JSON.stringify(state.cart))
   }, [state.cart])
 
   return (
@@ -135,14 +134,17 @@ const useProvideCart = () => {
   const { state, dispatch } = useCart()
 
   useEffect(() => {
-    localStorage.setItem('KenzieCart', JSON.stringify(state.cart))
-  }, [state.cart])
-
+    if(state !== initialState) {
+      localStorage.setItem("KenzieCart", JSON.stringify(state.cart))
+    }
+  }, [state.cart]);
+  
+  // Check for saved local cart on load and dispatch to set initial state
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('KenzieCart')) || false
     if (savedCart) {
       dispatch({
-        type: 'LOAD_CART',
+        type: 'INIT_SAVED_CART',
         payload: savedCart,
       })
     }
@@ -182,15 +184,10 @@ const useProvideCart = () => {
     })
   }
 
-  const toggleCurrency = () => {
-    dispatch({
-      type: 'TOGGLE_CURRENCY',
-      
-    })
-  }
+
   const isItemInCart = (id) => {
     return !!state.cart.find((item) => item._id === id)
-  }
+  };
 
   /*  Check for saved local cart on load and dispatch to set initial state
   useEffect(() => {
@@ -211,7 +208,6 @@ const useProvideCart = () => {
     removeAllItems,
     resetCart,
     isItemInCart,
-    toggleCurrency,
   }
 }
 
