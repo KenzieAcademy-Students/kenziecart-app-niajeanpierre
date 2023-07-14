@@ -4,7 +4,12 @@ const initialState = {
   cart: [],
   itemCount: 0,
   cartTotal: 0,
+  isEUR: false,
+  cartTotalString: "$0.00",
 }
+
+export const eurFormatter = new Intl.NumberFormat("en-US", {style: "currency", currency: "EUR"})
+export const usdFormatter = new Intl.NumberFormat("en-US", {style: "currency", currency: "USD"})
 
 const calculateCartTotal = (cartItems) => {
   let total = 0
@@ -17,6 +22,12 @@ const calculateCartTotal = (cartItems) => {
 const reducer = (state, action) => {
   let nextCart = [...state.cart];
   switch (action.type) {
+    case 'TOGGLE':
+      return {
+        ...state,
+        isEUR: !state.isEUR,
+        cartTotalString: state.isEUR ?  eurFormatter.format(state.cartTotal) : usdFormatter.format(state.cartTotal)
+      }
     case 'LOAD_CART':
       return {
         ...state,
@@ -123,16 +134,9 @@ export const useCart = () => {
 const useProvideCart = () => {
   const { state, dispatch } = useCart()
 
-  // useEffect(() => {
-  //   // Check for saved cart in localStorage on load
-  //   const savedCart = JSON.parse(localStorage.getItem('cart')) || []
-  //   if (savedCart.length > 0) {
-  //     dispatch({
-  //       type: 'LOAD_CART',
-  //       payload: savedCart,
-  //     })
-  //   }
-  // }, [dispatch])
+  useEffect(() => {
+    localStorage.setItem('KenzieCart', JSON.stringify(state.cart))
+  }, [state.cart])
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('KenzieCart')) || false
@@ -178,6 +182,12 @@ const useProvideCart = () => {
     })
   }
 
+  const toggleCurrency = () => {
+    dispatch({
+      type: 'TOGGLE_CURRENCY',
+      
+    })
+  }
   const isItemInCart = (id) => {
     return !!state.cart.find((item) => item._id === id)
   }
@@ -201,6 +211,7 @@ const useProvideCart = () => {
     removeAllItems,
     resetCart,
     isItemInCart,
+    toggleCurrency,
   }
 }
 

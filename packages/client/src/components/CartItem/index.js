@@ -4,12 +4,15 @@ import { Container, Row, Col, Button, Image } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { useUI, useProvideCart } from 'hooks'
+// import { useCurrency } from 'hooks/useCurrency'
 import './CartItem.scss'
 import { ItemCounter } from 'components'
 
 export default function CartItem({ item }) {
   const { closeSidebar } = useUI()
   const { removeAllItems } = useProvideCart()
+  // const { getPrice } = useCurrency()
+  
 
   return (
     <div className='item-box'>

@@ -7,10 +7,11 @@ import { ProvideCart } from 'hooks/useCart'
 import reportWebVitals from 'reportWebVitals'
 import './index.scss'
 
+
 ReactDOM.render(
   <React.StrictMode>
     <ManagedUIContext>
-      <ProvideCart>
+      <ProvideCart> 
         <AppRouter>
           <App />
         </AppRouter>
