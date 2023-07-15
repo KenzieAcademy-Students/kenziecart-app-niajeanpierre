@@ -1,34 +1,21 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar, Nav, Badge, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag } from '@fortawesome/free-solid-svg-icons/faShoppingBag';
-import { useUI } from 'hooks';
+import { useUI, useProvideCart } from 'hooks';
 import CartSidebar from 'components/CartSidebar';
-import { useProvideCart } from 'hooks';
-import { Button } from 'react-bootstrap';
-import { getAllProducts } from 'utils/axiosService';
+import useCurrency from 'hooks/useCurrency';
 
-
-const Header = () => {
+export default function Header() {
   const { openSidebar } = useUI();
-  const { toggleCurrency } = useProvideCart()
-  const handleToggle = () => {
-    toggleCurrency()
-  }
+  const { state } = useProvideCart();
+  const { currency, toggleCurrency } = useCurrency();
+  
   return (
     <>
       <CartSidebar />
       <Navbar expand='lg' style={{ backgroundColor: '#1D3868' }}>
-        {/* Currency toggle button */}
-        <Button
-          className='d-flex align-items-center ml-1'
-          style={{ color: 'white', cursor: 'pointer', marginRight: '20px' }}
-        onClick={handleToggle}
-        >
-          Toggle Currency
-        </Button>
-        {/* Other header content */}
         <Navbar.Brand>
           <LinkContainer to={'/'}>
             <Nav.Link>
@@ -39,6 +26,19 @@ const Header = () => {
         <Navbar.Toggle aria-controls='basic-navbar-nav' />
         <Navbar.Collapse id='basic-navbar-nav'>
           <Nav className='ml-auto mr-5' style={{ justifyContent: 'center' }}>
+          <div 
+          className='d-flex align-items-center gap-2' 
+          style={{color: "white", marginRight: "20px"}}
+          > 
+              $&nbsp;&nbsp;
+              <Form.Switch
+                id="currency"
+                name="currency"
+                checked={currency.multiplier === 0.8}
+                onChange={toggleCurrency}
+                />
+                €
+            </div> 
             <LinkContainer
               className='d-flex align-items-center'
               to={`/`}
@@ -57,6 +57,11 @@ const Header = () => {
                 icon={faShoppingBag}
                 style={{ color: 'white' }}
               />
+              {state.itemCount > 0 && (
+                <Badge pill variant="primary" className="mb-4">
+                  <p className='mb-0'> {state.itemCount}</p>
+                </Badge>
+              )}
             </div>
           </Nav>
         </Navbar.Collapse>
@@ -64,5 +69,3 @@ const Header = () => {
     </>
   );
 };
-
-export default Header;

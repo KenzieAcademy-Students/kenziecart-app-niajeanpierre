@@ -1,56 +1,64 @@
-// import React, { useContext, useReducer } from 'react';
 
 // // Step One: Create a reducer and context
 
-// const initialState = {
-//   currency: '$',
-//   multiplier: 1,
-// };
+const { createContext, useReducer, useContext, useEffect } = require("react");
 
-// const currencyReducer = (state, action) => {
-//   switch (action.type) {
-//     case 'SET_CURRENCY':
-//       return {
-//         ...state,
-//         currency: action.payload.currency,
-//         multiplier: action.payload.multiplier,
-//       };
-//     default:
-//       return state;
-//   }
-// };
+const currencyContext = createContext();
 
-// const CurrencyContext = createContext();
+export const CurrencyProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-// Step Two: Create the useCurrency hook
+  useEffect(() => {
+    const savedCurrency = JSON.parse(localStorage.getItem("CartCurrency")) || false;
 
-// export const useCurrency = () => {
-//   const context = useContext(CurrencyContext);
-//   if (context === undefined) {
-//     throw new Error(`useCurrency must be used within a CurrencyProvider`);
-//   }
-//   return context;
-// };
+    if(savedCurrency) {
+      dispatch ({ type: "LOAD_CURRENCY", ...savedCurrency })
+    } else {
+      localStorage.setItem("CartCurrency", JSON.stringify(state))
+    }
+  }, [])
 
-// Step Three: Create the CurrencyProvider component
+  return <currencyContext.Provider value={{state, dispatch}}>
+    {children}
+  </currencyContext.Provider>
+};
 
-// export const CurrencyProvider = ({ children }) => {
-// //   const [state, dispatch] = useReducer(currencyReducer, initialState);
+const initialState = {
+  symbol: '$',
+  multiplier: 1,
+};
 
-//   const setCurrency = (currency, multiplier) => {
-//     dispatch({
-//       type: 'SET_CURRENCY',
-//       payload: { currency, multiplier },
-//     });
-//   };
+ const reducer = (state, action) => {
+  const newState = structuredClone(state);
 
-//   return (
-//     <CurrencyContext.Provider value={{ state, setCurrency }}>
-//       {children}
-//     </CurrencyContext.Provider>
-//   );
-// };
+  switch (action.type) {
+    case 'TOGGLE_CURRENCY': {
+      newState.symbol = newState.symbol === "$" ? "€" : "$";
+      newState.multiplier = newState.multiplier === 1 ? 0.8 : 1;
+      break;
+    }
+    case "LOAD_CURRENCY": {
+      newState.symbol = action.symbol;
+      newState.multiplier = action.multiplier;
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  localStorage.setItem("CartCurrency", JSON.stringify(newState));
+  return newState;
+};
 
-// export default useCurrency;
+const useCurrency = () => {
+  const { state, dispatch } = useContext(currencyContext);
 
+  const toggleCurrency = () => dispatch({ type: "TOGGLE_CURRENCY"});
+  
+  const getPrice = (amount) => `${state.symbol}${(amount * state.multiplier)}`;
+
+  return { currency: state, getPrice, toggleCurrency };
+};
+
+export default useCurrency;
   

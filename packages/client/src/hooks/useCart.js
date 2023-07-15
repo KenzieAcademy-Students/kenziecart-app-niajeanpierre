@@ -17,12 +17,13 @@ export const calculateCartTotal = (cartItems) => {
 
 const reducer = (state, action) => {
   let nextCart = [...state.cart];
-  const numItemsToAdd = action.payload.quantity;
+ 
   switch (action.type) {
     case 'ADD_ITEM':
       const existingIndex = nextCart.findIndex(
         (item) => item._id === action.payload._id
       )
+      const numItemsToAdd = action.payload.quantity;
 
       if (existingIndex >= 0) {
         const newQuantity = parseInt(
