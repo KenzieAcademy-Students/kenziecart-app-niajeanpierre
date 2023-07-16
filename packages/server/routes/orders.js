@@ -22,6 +22,7 @@ router
     const {
       customerDetails: { firstName, lastName, email, address1, address2 },
       items,
+      coupon,
       orderTotal,
     } = req.body
     //Creating an orderData object
@@ -33,6 +34,7 @@ router
       customerAddress2: address2,
       items: itemIdList,
       orderTotal: orderTotal,
+      coupon,
     }
     try {
       /* create new order using Order model

@@ -1,5 +1,5 @@
-import mongoose from 'mongoose'
-const { ObjectId } = mongoose.Schema.Types
+import mongoose from "mongoose";
+const { ObjectId } = mongoose.Schema.Types;
 
 const orderSchema = new mongoose.Schema(
   {
@@ -22,17 +22,22 @@ const orderSchema = new mongoose.Schema(
     items: [
       {
         type: ObjectId,
-        ref: 'Product',
+        ref: "Product",
       },
     ],
     orderTotal: {
       type: Number,
       required: true,
     },
+    coupon: {
+      type: ObjectId,
+      ref: "Coupon",
+      required: false,
+    },
   },
   { timestamps: true }
-)
+);
 
-const Order = mongoose.model('Order', orderSchema)
+const Order = mongoose.model("Order", orderSchema);
 
-export default Order
+export default Order;

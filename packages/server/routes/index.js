@@ -1,5 +1,6 @@
 import express from 'express'
 import authRouter from './auth'
+import couponRouter from './coupons'
 import userRouter from './users'
 import ordersRouter from './orders'
 import productRouter from './products'
@@ -11,6 +12,7 @@ router.get('/', (req, res, next) => {
 })
 
 router.use('/auth', authRouter)
+router.use('/coupons', couponRouter)
 router.use('/users', userRouter)
 router.use('/orders', ordersRouter)
 router.use('/products', productRouter)

@@ -1,8 +1,8 @@
-import axios from 'utils/axiosConfig.js'
+import axios from "utils/axiosConfig.js";
 
 const getAllProducts = () => {
-  return axios.get('products')
-}
+  return axios.get("products");
+};
 
 const getProductById = (id) => {
   return axios({
@@ -12,15 +12,19 @@ const getProductById = (id) => {
         id: id,
       },
     },
-  })
-}
+  });
+};
+
+const verifyCoupon = (code) => {
+  return axios.get("/coupons/verify", { params: { code } });
+};
 
 const createOrder = (data) => {
-  return axios.post('/orders', data)
-}
+  return axios.post("/orders", data);
+};
 
 const findByName = (name) => {
-  return axios.get(`/products?name=${name}`)
-}
+  return axios.get(`/products?name=${name}`);
+};
 
-export { getAllProducts, getProductById, createOrder, findByName }
+export { getAllProducts, getProductById, createOrder, findByName, verifyCoupon };
