@@ -50,3 +50,6 @@ npm run seed
 1. Add handler to inputs [Consult React Payments README](https://github.com/medipass/react-payment-inputs#with-hooks)
 2. Disable **Complete Order** button until valid
 3. Validate before submitting in **handlePlaceOrder()**
+
+
+Used Cody's review for completion of code.
